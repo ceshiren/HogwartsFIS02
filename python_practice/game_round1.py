@@ -22,12 +22,8 @@ def fight():
     elif my_final_hp < your_final_hp:
         print("你赢了")
     else:
-        print("平局")
+        raise Exception("no peace, 不要平局，战斗到最后一刻")
+        # print("平局")
 
 ### 调用fight 函数
 fight()
-
-
-
-
-
