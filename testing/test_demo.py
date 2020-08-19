@@ -2,19 +2,22 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-
+@pytest.mark.third
 def test_a():
     print("test_demo.py  测试用例a")
 
 
+@pytest.mark.second
 def test_b():
     print("test_demo.py  测试用例b")
 
 
+@pytest.mark.first
 def test_c():
     assert 1 == 2
 
 
+@pytest.mark.fourth
 def test_d():
     assert 100 == 200
 

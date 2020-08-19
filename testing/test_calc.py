@@ -14,7 +14,7 @@ class TestCalc:
     #     print("结束计算")
 
     @pytest.mark.add
-    def test_add1(self, get_calc, get_datas):
+    def test_add_int(self, get_calc, get_datas):
         # # 实例化计算器
         # calc = Calculator()
         # 调用它的相加add() 方法
@@ -24,20 +24,34 @@ class TestCalc:
         # 断言
         assert get_datas[2] == result
 
-    def test_add2(self):
+    def test_add_float(self):
         result = self.calc.add(0.1, 0.2)
         # 断言
         assert 0.3 == round(result, 2)
 
     @pytest.mark.div
-    def test_div(self):
+    def test_div_int(self):
         # # 实例化计算器
         # calc = Calculator()
         r = self.calc.div(1, 1)
         assert 1 == r
 
     @pytest.mark.div
-    def test_div1(self):
+    def test_div_float(self):
+        # # 实例化计算器
+        # calc = Calculator()
+        r = self.calc.div(-1, 1)
+        assert -1 == r
+
+    @pytest.mark.div
+    def test_div_str(self):
+        # # 实例化计算器
+        # calc = Calculator()
+        r = self.calc.div(-1, 1)
+        assert -1 == r
+
+    @pytest.mark.div
+    def test_div_0(self):
         # # 实例化计算器
         # calc = Calculator()
         r = self.calc.div(-1, 1)
