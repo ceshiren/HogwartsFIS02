@@ -11,9 +11,10 @@ from selenium.webdriver.common.by import By
 class TestDemo0():
     def setup_method(self, method):
         option = Options()
-        # option.debugger_address = '127.0.0.1:9222'
-        # self.driver = webdriver.Chrome(options=option)
-        self.driver = webdriver.Chrome()
+        option.debugger_address = '127.0.0.1:9222'
+        self.driver = webdriver.Chrome(options=option)
+        # self.driver = webdriver.Chrome()
+        self.driver.maximize_window()
         # 隐式等待，动态的等待元素，最好在实例化driver之后立刻去设置
         self.driver.implicitly_wait(5)
 
