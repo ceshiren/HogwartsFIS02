@@ -5,6 +5,8 @@
 # Then you can paste this into a file and simply run with Python
 from time import sleep
 
+import pytest
+import yaml
 from appium import webdriver
 from appium.webdriver.common.mobileby import MobileBy
 from selenium.webdriver.support.wait import WebDriverWait
@@ -13,6 +15,13 @@ from selenium.webdriver.support.wait import WebDriverWait
 改造1：使用 pytest 测试框架
 """
 
+
+def get_datas():
+    with open("./datas/addcontacts.yml", encoding='utf-8') as f:
+        contact_datas = yaml.safe_load(f)
+        addcontact = contact_datas['add']
+        delcontact = contact_datas['del']
+    return [addcontact, delcontact]
 
 class TestWeXin:
     def setup(self):
@@ -24,7 +33,7 @@ class TestWeXin:
         caps["noReset"] = "true"
         caps['settings[waitForIdleTimeout]'] = 1  # 等待页面空闲的时间
         # 最重要的一行代码，客户端代码与 Appium Server 建立连接,同时启动起来欢迎页 appActivity
-        self.driver = webdriver.Remote("http://localhost:4723/wd/hub", caps)
+        self.driver = webdriver.Remote("http://127.0.0.1:4723/wd/hub", caps)
         # 隐式等待
         self.driver.implicitly_wait(5)
 
@@ -68,14 +77,15 @@ class TestWeXin:
         result = self.driver.find_element(MobileBy.ID, "com.tencent.wework:id/mk").text
         assert "外出打卡成功" == result
 
-    def test_addcontact(self):
+    @pytest.mark.parametrize("name,gender,phonenum", get_datas()[0])
+    def test_addcontact(self, name, gender, phonenum):
         '''
         添加联系人
         :return:
         '''
-        name = "hogwarts002"
-        gender = "男"
-        phonenum = "13600000002"
+        # name = "hogwarts002"
+        # gender = "男"
+        # phonenum = "13600000002"
         self.driver.find_element(MobileBy.XPATH, "//*[@text='通讯录']").click()
         # self.driver.find_element(MobileBy.XPATH, "//*[@text='添加成员']").click()
         self.driver.find_element(MobileBy.ANDROID_UIAUTOMATOR,
@@ -100,3 +110,31 @@ class TestWeXin:
         # print(self.driver.page_source)
         mytoast = self.driver.find_element(MobileBy.XPATH, "//*[@class='android.widget.Toast']").text
         assert "添加成功" == mytoast
+
+    @pytest.mark.parametrize("name", get_datas()[1])
+    def test_delcontact(self, name):
+        # name = "霍格沃兹05"
+        self.driver.find_element(MobileBy.XPATH, "//*[@text='通讯录']").click()
+        self.driver.find_element(MobileBy.ID, "com.tencent.wework:id/gq_").click()
+        self.driver.find_element(MobileBy.ID, "com.tencent.wework:id/ffq").send_keys(name)
+        sleep(2)
+        eles = self.driver.find_elements(MobileBy.XPATH, f"//*[@text='{name}']")
+        beforenum = len(eles)
+        if beforenum < 2:
+            print("没有可删除的人员")
+            return
+
+        eles[1].click()
+        self.driver.find_element(MobileBy.ID, "com.tencent.wework:id/gq0").click()
+        self.driver.find_element(MobileBy.XPATH, f"//*[@text='编辑成员']").click()
+        # self.driver.find_element(MobileBy.XPATH, f"//*[@text='删除成员']").click()
+        self.driver.find_element(MobileBy.ANDROID_UIAUTOMATOR,
+                                 'new UiScrollable(new UiSelector()'
+                                 '.scrollable(true).instance(0))'
+                                 '.scrollIntoView(new UiSelector()'
+                                 '.text("删除成员").instance(0));').click()
+        self.driver.find_element(MobileBy.XPATH, f"//*[@text='确定']").click()
+        sleep(2)
+        eles1 = self.driver.find_elements(MobileBy.XPATH, f"//*[@text='{name}']")
+        afternum = len(eles1)
+        assert afternum == beforenum - 1
